@@ -25,7 +25,7 @@ function gradientDescent(n=0) {
 
 // Fase de treinamento: execução dos backpropagations, a cada execução teremos pesos mais próximos do ideal
 // nos emitindo respostas cada vez mais próximas de target.
-function feedForward(inputs=[], target=0, epochs=1) {
+function feedForward(inputs=[], target=0, epochs=1, activation='sigmoid') {
 	// Valores somente entre 0 e 1. Para facilitar aprendizado.
 	// Se target é menos ou = a zero, target receberá um valor próximo de 0.
 	if(target<=0) target = 0.1;
@@ -52,8 +52,15 @@ function feedForward(inputs=[], target=0, epochs=1) {
 		}
 
 		let sum = funcSum(multiply); // irá receber o retorno da função somatória no array Mulitply
-		let output = parseFloat(relu(sum)).toFixed(4); // uma tangente hiperbólica p formatar os dados
-		// qq valor numerico dentro de intervalo entre -1 e 1.
+		let output = 0;
+		switch(activation) {
+			case 'tanh': output = parseFloat(tanh(sum)).toFixed(4); break;
+			case 'sigmoid': output = parseFloat(sigmoid(sum)).toFixed(4); break;
+			case 'relu': output = parseFloat(relu(sum)).toFixed(4); break;
+			case 'leakyRelu': output = parseFloat(leakyRelu(sum)).toFixed(4); break;
+			case 'binaryStep': output = parseFloat(binaryStep(sum)).toFixed(4); break;
+			default: parseFloat(sigmoid(sum)).toFixed(4); 
+		}
 		// 4 casas decimais, para melhor entendimento.
 
 		let error = parseFloat(Math.abs(target - output)).toFixed(4); //valor absoluto p calcular a diferença
@@ -62,6 +69,7 @@ function feedForward(inputs=[], target=0, epochs=1) {
 		for(let j=0; j<inputs.length; j++) { 
 			// estarei otimizando os pesos ao final do loo pp ara a próxima iteração, tornando os 
 			// pesos mais precisos e cada vez fornecendo resultados mais próximos de target.
+			if(inputs[j]<=0) inputs[j] = 0.1;
 			weights[j] += inputs[j] * gradientDescent(error);
 		}
 		let epoch = i.toString().padStart(7, '0'); // poder formatar o índicie na saída, usando 7 espaços
@@ -101,10 +109,12 @@ function binaryStep(n=0) { return (n >= 0) ? 1 : 0; }
 // IMPORTANTE: se iusar quanto dade grande de épocas, a rede poderá encontrar antes da hora e
 // execitar os ŕocimos de forma denecessaria, demorando p emirie o resultado. Se usar uma quantodade
 // redizuda, não estarei dando o tempoi necessário patra aprender, tranzendo resultado abaixo do q espera.
-//feedForward([0], 0.1, 800);
+
+
+feedForward([0], 0.1, 800, 'relu');
 
 
 // Mais de uma entrada e uma saída.
-feedForward([0, 0], 0.2, 1000);
+// feedForward([0, 0], 0.2, 1000);
 
 
